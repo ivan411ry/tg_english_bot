@@ -1,0 +1,35 @@
+services:
+  postgres_english_bot:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: english_bot
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d english_bot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    image: migrate/migrate:v4.19.1
+    volumes:
+      - ./migrations:/migrations
+    command:
+      [
+        "-path", "/migrations",
+        "-database", "postgres://postgres:postgres@postgres_english_bot:5432/english_bot?sslmode=disable",
+        "up"
+      ]
+    depends_on:
+      postgres_english_bot:
+        condition: service_healthy
+
+  english_bot:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres_english_bot:5432/english_bot?sslmode=disable
+    depends_on:
+      postgres_english_bot:
+        condition: service_healthy
