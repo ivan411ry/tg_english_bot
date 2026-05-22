@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	BotToken       string
-	DatabaseURL    string
-	UpdatesTimeout time.Duration
+	BotToken        string
+	DatabaseURL     string
+	UpdatesTimeout  time.Duration
+	SpecialUsername string
 }
 
 func Load() (*Config, error) {
@@ -20,6 +21,8 @@ func Load() (*Config, error) {
 	// Если файла нет, не падаем, переменные могут уже прийти из окружения
 	//например через docker compose env_file
 	_ = godotenv.Load()
+	specialUsername := os.Getenv("SPECIAL_USERNAME")
+
 	botToken := os.Getenv("BOT_TOKEN")
 	if botToken == "" {
 		return nil, fmt.Errorf("BOT_TOKEN empty")
@@ -40,8 +43,9 @@ func Load() (*Config, error) {
 	}
 
 	return &Config{
-		BotToken:       botToken,
-		DatabaseURL:    databaseURL,
-		UpdatesTimeout: timeout,
+		BotToken:        botToken,
+		DatabaseURL:     databaseURL,
+		UpdatesTimeout:  timeout,
+		SpecialUsername: specialUsername,
 	}, nil
 }

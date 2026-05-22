@@ -95,7 +95,7 @@ func (r *Router) handleTextMessage(ctx context.Context, update tgbotapi.Update) 
 	case "Мои слова":
 		r.sendText(
 			update.Message.Chat.ID,
-			"Не гони коней. В разработке пока что, скоро все будет",
+			"Пока что я тупенький, но скоро всё будет =**",
 			"sending my-words placeholder error",
 		)
 		return

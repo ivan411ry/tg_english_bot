@@ -67,7 +67,7 @@ func main() {
 	cardStorage := pgStorage
 	cardService := service.NewCardService(cardStorage)
 	// Создаем хендлеры
-	appHandlers := handlers.NewHandler(bot, userStorage, cardStorage, stateManager, cardService)
+	appHandlers := handlers.NewHandler(bot, userStorage, cardStorage, stateManager, cardService, cfg.SpecialUsername)
 	logger.Log.Info("handlers initialized")
 
 	// Настройка получения обновлений от Telegram
