@@ -4,6 +4,10 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: english_bot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d english_bot"]
       interval: 5s
@@ -11,13 +15,17 @@ services:
       retries: 10
 
   migrate:
-    image: migrate/migrate:v4.19.1
+    build:
+      context: .
+      dockerfile: Dockerfile.migrations
     volumes:
       - ./migrations:/migrations
     command:
       [
-        "-path", "/migrations",
-        "-database", "postgres://postgres:postgres@postgres_english_bot:5432/english_bot?sslmode=disable",
+        "-dir",
+        "/migrations",
+        "postgres",
+        "postgres://postgres:postgres@postgres_english_bot:5432/english_bot?sslmode=disable",
         "up"
       ]
     depends_on:
@@ -33,3 +41,10 @@ services:
     depends_on:
       postgres_english_bot:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
