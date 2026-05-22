@@ -20,7 +20,7 @@ type userStorage interface {
 type cardStorage interface {
 	CreateCard(ctx context.Context, userID int, word string, translation string) (int, error)
 	GetRandomCard(ctx context.Context, userID int) (models.Card, error)
-	GetCardByID(ctx context.Context, cardID int) (models.Card, error)
+	GetCardByID(ctx context.Context, cardID int, userID int) (models.Card, error)
 }
 type stateManager interface {
 	SetState(telegramID int64, state state.State, data state.Data, userID int)

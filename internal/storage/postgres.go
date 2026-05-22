@@ -93,13 +93,13 @@ LIMIT 1
 }
 
 // GetCardByID Находит карту по ID. Нужна, чтобы выдавать правильный перевод
-func (s *PostgresStorage) GetCardByID(ctx context.Context, cardID int) (models.Card, error) {
+func (s *PostgresStorage) GetCardByID(ctx context.Context, cardID int, userID int) (models.Card, error) {
 	const query = `
 SELECT id, user_id, word, translation
 FROM cards
-WHERE id = $1
+WHERE id = $1 and user_id = $2
 `
-	row := s.db.QueryRow(ctx, query, cardID)
+	row := s.db.QueryRow(ctx, query, cardID, userID)
 	var card models.Card
 	err := row.Scan(&card.ID, &card.UserID, &card.Word, &card.Translation)
 	if err != nil {

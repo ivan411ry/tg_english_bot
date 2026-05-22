@@ -218,7 +218,7 @@ func (h *Handler) PracticeCallback(ctx context.Context, callback *tgbotapi.Callb
 			return
 		}
 		// Получаем карточку по ID из БД.
-		card, err := h.cardStorage.GetCardByID(ctx, cardID)
+		card, err := h.cardStorage.GetCardByID(ctx, cardID, userID)
 		if err != nil {
 			logger.Log.Error(
 				"getting card error",
