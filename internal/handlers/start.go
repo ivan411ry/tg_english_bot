@@ -58,6 +58,9 @@ func (h *Handler) Start(ctx context.Context, update tgbotapi.Update) {
 
 	// Создаём клавиатуру с основными действиями.
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Что пожелаете, хозяин?")
+	if username == h.specialUsername {
+		msg.Text = "Привет, моя королева 👑. Что пожелаешь?"
+	}
 
 	button1 := tgbotapi.NewKeyboardButton("Добавить слово")
 	button2 := tgbotapi.NewKeyboardButton("Мои слова")

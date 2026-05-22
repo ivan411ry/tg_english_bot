@@ -20,6 +20,7 @@ import (
 // 3. пользователь ввёл перевод -> сохраняем карточку
 func (h *Handler) Add(ctx context.Context, update tgbotapi.Update) {
 	telegramID := update.Message.From.ID
+	username := update.Message.From.UserName
 	// Достаём текущее состояние пользователя из FSM.
 	userState, stateErr := h.state.GetState(telegramID)
 	if stateErr != nil {
@@ -27,6 +28,9 @@ func (h *Handler) Add(ctx context.Context, update tgbotapi.Update) {
 			logger.Log.Error("no state found for user", zap.Int64("telegram_id", telegramID))
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Сначала нажмите /start")
+			if username == h.specialUsername {
+				msg.Text = "Любовь моя, нажми /start"
+			}
 			if _, sendErr := h.bot.Send(msg); sendErr != nil {
 				logger.Log.Error("sending /add precondition error", zap.Error(sendErr))
 			}
@@ -52,6 +56,9 @@ func (h *Handler) Add(ctx context.Context, update tgbotapi.Update) {
 	case state.StateIdle:
 		h.state.SetState(telegramID, state.StateWaitingForWord, state.Data{}, userID)
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Введите слово")
+		if username == h.specialUsername {
+			msg.Text = "Набери своими прекрасными руками слово которое хочешь запомнить"
+		}
 		if _, err := h.bot.Send(msg); err != nil {
 			logger.Log.Error("sending ask-word message error", zap.Error(err))
 		}
@@ -68,6 +75,9 @@ func (h *Handler) Add(ctx context.Context, update tgbotapi.Update) {
 		}
 		h.state.SetState(telegramID, state.StateWaitingForTranslation, state.Data{Word: word}, userID)
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Введите перевод")
+		if username == h.specialUsername {
+			msg.Text = "А теперь перевод, любовь моя"
+		}
 		if _, sendErr := h.bot.Send(msg); sendErr != nil {
 			logger.Log.Error("sending ask-translation message error", zap.Error(sendErr))
 		}
@@ -80,6 +90,9 @@ func (h *Handler) Add(ctx context.Context, update tgbotapi.Update) {
 
 		if errors.Is(err, service.ErrCardExists) {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Такая карточка уже есть")
+			if username == h.specialUsername {
+				msg.Text = "Солнце, ты, наверное забыла, но такая карточка у тебя уже есть"
+			}
 			if _, sendErr := h.bot.Send(msg); sendErr != nil {
 				logger.Log.Error("sending duplicate-card message error", zap.Error(sendErr))
 			}
@@ -88,6 +101,9 @@ func (h *Handler) Add(ctx context.Context, update tgbotapi.Update) {
 
 		if errors.Is(err, service.ErrTranslationIsEmpty) {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Перевод не может быть пустым. Введите перевод")
+			if username == h.specialUsername {
+				msg.Text = "Свет очей моих. Не может перевод быть пустым"
+			}
 			if _, sendErr := h.bot.Send(msg); sendErr != nil {
 				logger.Log.Error("sending empty-translation message error", zap.Error(sendErr))
 			}
@@ -103,6 +119,9 @@ func (h *Handler) Add(ctx context.Context, update tgbotapi.Update) {
 		}
 		h.state.SetState(telegramID, state.StateIdle, state.Data{}, userID)
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Слово сохранено!")
+		if username == h.specialUsername {
+			msg.Text = "Готово, любовь моя. Слово сохранено 💛"
+		}
 		if _, sendErr := h.bot.Send(msg); sendErr != nil {
 			logger.Log.Error("sending save success message error", zap.Error(sendErr))
 		}

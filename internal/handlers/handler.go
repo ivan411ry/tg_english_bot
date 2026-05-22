@@ -33,11 +33,12 @@ type cardService interface {
 
 // Handler хранит общие зависимости для всех обработчиков.
 type Handler struct {
-	bot         bot
-	userStorage userStorage
-	cardStorage cardStorage
-	state       stateManager
-	cardService cardService
+	bot             bot
+	userStorage     userStorage
+	cardStorage     cardStorage
+	state           stateManager
+	cardService     cardService
+	specialUsername string
 }
 
 func NewHandler(
@@ -46,12 +47,14 @@ func NewHandler(
 	cardStorage cardStorage,
 	stateManager stateManager,
 	cardService cardService,
+	specialUsername string,
 ) *Handler {
 	return &Handler{
-		bot:         bot,
-		userStorage: userStorage,
-		cardStorage: cardStorage,
-		state:       stateManager,
-		cardService: cardService,
+		bot:             bot,
+		userStorage:     userStorage,
+		cardStorage:     cardStorage,
+		state:           stateManager,
+		cardService:     cardService,
+		specialUsername: specialUsername,
 	}
 }
